@@ -29,7 +29,7 @@ class Trader:
         self.current = None
         self.daycount = 0
         self.previous = []
-        self.stocks = self.API.getListStocks()[:-1]
+        self.stocks = self.API.getListStocks()
         
         
         self.t = threading.currentThread()
@@ -51,7 +51,7 @@ class Trader:
         else:
             self.daycount += 1
 
-            if self.daycount > 5:
+            if self.daycount > 4:
                 self.previous = self.previous[1:] + [self.current]
             else:
                 self.previous += [self.current]
@@ -59,28 +59,35 @@ class Trader:
             self.current = time
 
         print(self.daycount)
-        if self.daycount > 5:
+        if self.daycount > 4:
             change = []
             for stock in self.stocks:
 
                 prices = self.API.getPastPrice(stock, self.previous[0], self.previous[-1])
                 change += [prices[self.previous[-1]]/prices[self.previous[0]]]
-            best = np.argmax(np.array(change))
-            best_stock = self.stocks[best]
-
-            print(change)
-
             self.sell_all()
-            for c in change:
+            to_buy = []
+            sum = 0
+            for s, c in zip(self.stocks, change):
                 if c > 1:
-                    self.buy_max(best_stock)
+                    to_buy += [[s, c - 1]]
+                    sum += c - 1
 
+            cash = self.API.getUserCash()
+            for i in range(len(to_buy)):
+                percent = to_buy[i][1]/sum
+                self.buy_amount(to_buy[i][0], cash*percent)
 
     def sell_all(self):
         for stock in self.stocks:
             self.API.marketSell(stock, self.API.getUserStocks()[stock])
 
     def buy_max(self, stock):
-        max_to_buy = math.floor(self.API.getUserCash()/self.API.getPrice(stock))
+        max_to_buy = self.API.getUserCash()/self.API.getPrice(stock)
         self.API.marketBuy(stock, max_to_buy)
+
+    def buy_amount(self, stock, amount):
+        to_buy = (amount-0.01)/self.API.getPrice(stock)
+        if self.API.marketBuy(stock, to_buy) != 0:
+            print("hey")
 

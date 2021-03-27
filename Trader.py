@@ -25,6 +25,7 @@ class Trader:
     def run(self):
         
         """You can add initialization code here"""
+        self.current = None
         
         
         self.t = threading.currentThread()
@@ -40,5 +41,10 @@ class Trader:
     """Your trading algorithm goes here!
         The function is called continuously"""
     def trade(self):
-        pass
+        time = self.API.getTime()
+        if self.current == time:
+            return
+        else:
+            self.current = time
+        self.API.marketBuy("OZV", 1)
     

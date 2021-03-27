@@ -1,7 +1,8 @@
 
 import threading
 import time
-import numpy
+import math
+import numpy as np
 
 class Trader:
     
@@ -26,6 +27,9 @@ class Trader:
         
         """You can add initialization code here"""
         self.current = None
+        self.daycount = 0
+        self.previous = []
+        self.stocks = self.API.getListStocks()
         
         
         self.t = threading.currentThread()
@@ -45,6 +49,36 @@ class Trader:
         if self.current == time:
             return
         else:
+            self.daycount += 1
+
+            if self.daycount > 2:
+                self.previous = self.previous[1:] + [self.current]
+            else:
+                self.previous += [self.current]
+
             self.current = time
-        self.API.marketBuy("OZV", 1)
-    
+
+        print(self.daycount)
+        if self.daycount > 2:
+            change = []
+            for stock in self.stocks:
+
+                prices = self.API.getPastPrice(stock, self.previous[0], self.previous[1])
+                change += [prices[self.previous[1]]/prices[self.previous[0]]]
+            best = np.argmax(np.array(change))
+            best_stock = self.stocks[best]
+
+            print(change)
+
+            self.sell_all()
+            self.buy_max(best_stock)
+
+
+    def sell_all(self):
+        for stock in self.stocks():
+            self.API.marketSell(stock, self.API.getUserStocks()[stock])
+
+    def buy_max(self, stock):
+        max_to_buy = math.floor(self.API.getUserCash()/self.API.getPrice(stock))
+        self.API.marketBuy(stock, max_to_buy)
+

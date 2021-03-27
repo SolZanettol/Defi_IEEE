@@ -45,13 +45,16 @@ class Trader:
     """Your trading algorithm goes here!
         The function is called continuously"""
     def trade(self):
+
+        fenetre = 4
+
         time = self.API.getTime()
         if self.current == time:
             return
         else:
             self.daycount += 1
 
-            if self.daycount > 4:
+            if self.daycount > fenetre:
                 self.previous = self.previous[1:] + [self.current]
             else:
                 self.previous += [self.current]
@@ -59,7 +62,7 @@ class Trader:
             self.current = time
 
         print(self.daycount)
-        if self.daycount > 4:
+        if self.daycount > fenetre:
             change = []
             for stock in self.stocks:
 

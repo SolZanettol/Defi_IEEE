@@ -67,7 +67,7 @@ class Trader:
             for stock in self.stocks:
 
                 prices = self.API.getPastPrice(stock, self.previous[0], self.previous[-1])
-                change += [prices[self.previous[-1]]/prices[self.previous[0]]]
+                change += [(0.6*prices[self.previous[-1]]/prices[self.previous[0]])+(0.4*prices[self.previous[-1]]/prices[self.previous[-2]])]
             self.sell_all()
             to_buy = []
             sum = 0

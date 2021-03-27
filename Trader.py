@@ -29,15 +29,15 @@ class Trader:
         self.current = None
         self.daycount = 0
         self.previous = []
-        self.stocks = self.API.getListStocks()
+        self.stocks = self.API.getListStocks()[:-1]
         
         
         self.t = threading.currentThread()
         while getattr(self.t, "run", True):
             try:
                 self.trade()
-            except:
-                pass
+            except Exception as err:
+                print(err)
             time.sleep(0)
             
             
@@ -75,7 +75,7 @@ class Trader:
 
 
     def sell_all(self):
-        for stock in self.stocks():
+        for stock in self.stocks:
             self.API.marketSell(stock, self.API.getUserStocks()[stock])
 
     def buy_max(self, stock):

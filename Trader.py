@@ -51,7 +51,7 @@ class Trader:
         else:
             self.daycount += 1
 
-            if self.daycount > 2:
+            if self.daycount > 5:
                 self.previous = self.previous[1:] + [self.current]
             else:
                 self.previous += [self.current]
@@ -59,19 +59,21 @@ class Trader:
             self.current = time
 
         print(self.daycount)
-        if self.daycount > 2:
+        if self.daycount > 5:
             change = []
             for stock in self.stocks:
 
-                prices = self.API.getPastPrice(stock, self.previous[0], self.previous[1])
-                change += [prices[self.previous[1]]/prices[self.previous[0]]]
+                prices = self.API.getPastPrice(stock, self.previous[0], self.previous[-1])
+                change += [prices[self.previous[-1]]/prices[self.previous[0]]]
             best = np.argmax(np.array(change))
             best_stock = self.stocks[best]
 
             print(change)
 
             self.sell_all()
-            self.buy_max(best_stock)
+            for c in change:
+                if c > 1:
+                    self.buy_max(best_stock)
 
 
     def sell_all(self):

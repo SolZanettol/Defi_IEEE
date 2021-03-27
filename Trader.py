@@ -15,7 +15,7 @@ class Trader:
     """
     
     #Nom de l'equipe:
-    equipe = ''
+    equipe = 'GameStonks _↗'
 
     def __init__(self, API):
         
@@ -36,8 +36,8 @@ class Trader:
         while getattr(self.t, "run", True):
             try:
                 self.trade()
-            except Exception as err:
-                print(err)
+            except:
+                pass
             time.sleep(0)
             
             
@@ -67,7 +67,7 @@ class Trader:
             for stock in self.stocks:
 
                 prices = self.API.getPastPrice(stock, self.previous[0], self.previous[-1])
-                change += [(0.6*prices[self.previous[-1]]/prices[self.previous[0]])+(0.4*prices[self.previous[-1]]/prices[self.previous[-2]])]
+                change += [(0.7*prices[self.previous[-1]]/prices[self.previous[0]])+(0.3*prices[self.previous[-1]]/prices[self.previous[-2]])]
             self.sell_all()
             to_buy = []
             sum = 0
